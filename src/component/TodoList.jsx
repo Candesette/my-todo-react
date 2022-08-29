@@ -8,5 +8,5 @@ export function TodoList({ todos, toggleTodo }) {
         <TodoItem key={index} todo={todo} toggleTodo={toggleTodo} />
       ))}
     </ul>
-    );
+  );
 }

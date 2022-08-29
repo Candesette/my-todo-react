@@ -1,55 +1,75 @@
 import logo from "./logo.svg";
 /*import './App.css';*/
 import React, { useState, useRef, useEffect } from "react";
-import {v4 as uuidv4} from 'uuid'
-import { TodoList } from "./component/TodoList";
+import { v4 as uuidv4 } from "uuid";
+import { TodoList } from "../home/TodoList";
 
-const key = 'todoApp.todos';
+const key = "todoApp.todos";
 
 export function App() {
-  const [todos, setTodos] = useState([
-    { id: 1, task: "Tarea 1", completed: false },
-  ]);
-  
+  const [todos, setTodos] = useState([]);
+
   const todoTaskRef = useRef();
 
   useEffect(() => {
-    const storedTodos = JSON.parse(localStorage.getItem (key));
-    if (storedTodos){
+    const storedTodos = JSON.parse(localStorage.getItem(key));
+
+    if (storedTodos) {
       setTodos(storedTodos);
     }
-  }, [])
+    console.log(storedTodos)
+  }, []);
 
-  useEffect(() => {
-    localStorage.setItem( key, JSON.stringify(todos))
-  }, [todos]);
 
   const toggleTodo = (id) => {
     const newTodos = [...todos];
+
     const todo = newTodos.find((todo) => todo.id === id);
+
     todo.completed = !todo.completed;
-    setTodos (newTodos);
-  }
+
+    setTodos(newTodos);
+
+    localStorage.setItem(key, JSON.stringify(newTodos));
+
+  };
+
   const handleTodoAdd = () => {
     const task = todoTaskRef.current.value;
     if (task === "") return;
+
     setTodos((prevTodos) => {
-      return [...prevTodos, {id: uuidv4(), task, completed: false}]
+      const todosToAppend = [...prevTodos, { id: uuidv4(), task, completed: false }] 
+
+      localStorage.setItem(key, JSON.stringify(todosToAppend));
+
+      return todosToAppend;
+
     });
-    todoTaskRef.current.value = null
+
+    todoTaskRef.current.value = null;
   };
+
   const handleClearAll = () => {
     const newTodos = todos.filter((todo) => !todo.completed);
+
     setTodos(newTodos);
-  }
+
+    localStorage.setItem(key, JSON.stringify(newTodos));
+    
+  };
+
   return (
     <React.Fragment>
-      <TodoList todos={todos} toggleTodo={toggleTodo}/>
+      <TodoList todos={todos} toggleTodo={toggleTodo} />
       <input ref={todoTaskRef} type="text" placeholder="Nueva Tarea"></input>
       <button onClick={handleTodoAdd}>Add</button>
       <button onClick={handleClearAll}>Delete</button>
-      
-      <div>Te quedan {todos.filter((todo) => !todo.completed).length} tareas por terminar</div>
+
+      <div>
+        Te quedan {todos.filter((todo) => !todo.completed).length} tareas por
+        terminar
+      </div>
     </React.Fragment>
   );
 
