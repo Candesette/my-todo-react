@@ -1,15 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { App } from "./App";
+import { Home } from "./scenes/Home";
 import reportWebVitals from "./reportWebVitals";
-import { TodoList } from "./component/TodoList";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("no root html tag not found");
+}
+const root = ReactDOM.createRoot(rootElement);
+
 root.render(
-  <React.Fragment>
-    <App />
-  </React.Fragment>
+  <React.StrictMode>
+    <Home />
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

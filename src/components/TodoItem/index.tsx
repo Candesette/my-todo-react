@@ -1,11 +1,14 @@
 import React from "react";
+import { Item } from "../../scenes/Home";
 
-export function TodoItem({ todo, toggleTodo }) {
+type Props = {
+  todo: Item;
+  toggleTodo: (id: string) => void;
+};
+
+export function TodoItem({ todo, toggleTodo }: Props) {
   const { id, task, completed } = todo;
-  /*  const handleTodoClick = () => {
-    toggleTodo(id);
-  };
- */
+
   return (
     <li>
       <input
