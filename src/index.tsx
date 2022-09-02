@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { Home } from "./scenes/Home";
+import { Home } from "./scenes/Home/";
 import reportWebVitals from "./reportWebVitals";
 
 const rootElement = document.getElementById("root");
