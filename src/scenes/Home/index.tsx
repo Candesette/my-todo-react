@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { TodoList } from "../../components/TodoList";
+import { Border, Button, Container, ContainerChildren, Input, TextStyle } from "../../core";
 
 const key = "todoApp.todos";
 
@@ -12,7 +13,7 @@ export function Home() {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    const storedTodos = JSON.parse(localStorage.getItem(key) ?? "");
+    const storedTodos = JSON.parse(localStorage.getItem(key) ?? "[]");
 
     if (storedTodos) {
       setTodos(storedTodos);
@@ -62,16 +63,27 @@ export function Home() {
   };
 
   return (
-    <>
-      <TodoList todos={todos} toggleTodo={toggleTodo} />
-      <input ref={inputRef} type="text" placeholder="Nueva Tarea"></input>
-      <button onClick={handleTodoAdd}>Add</button>
-      <button onClick={handleClearAll}>Delete</button>
+   <>
+    <Container>
+      <ContainerChildren>
+        <Input ref={inputRef} type="text" placeholder="New Task"></Input>
+        <Button onClick={handleTodoAdd}>Add</Button>
+        <button onClick={handleClearAll}>Delete</button>
 
-      <div>
+        <TextStyle>
         Te quedan {todos.filter((todo) => !todo.completed).length} tareas por
         terminar
-      </div>
+        </TextStyle>
+
+        <Border>
+        <TodoList todos={todos} toggleTodo={toggleTodo} />
+        </Border>
+        
+      </ContainerChildren>
+      
+    </Container>
+      
+    
     </>
   );
 }
