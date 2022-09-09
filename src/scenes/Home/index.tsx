@@ -1,7 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { TodoList } from "../../components/TodoList";
-import { Border, Button, Container, ContainerChildren, Input, TextStyle } from "../../core";
+import { TextStyle } from "../../core/TextStyle";
+import { Button, DeleteButton } from "../../core/Button";
+import { Container } from "../../core/Container";
+import { ContainerChildren } from "../../core/ContainerChildren";
+import { Border } from "../../core/Border";
+import { Input } from "../../core/Input";
+import { Grid } from "../../core/Grid";
 
 const key = "todoApp.todos";
 
@@ -62,28 +68,30 @@ export function Home() {
     localStorage.setItem(key, JSON.stringify(newTodos));
   };
 
+  const remainingTask = todos.filter((todo) => !todo.completed).length;
+
   return (
-   <>
     <Container>
       <ContainerChildren>
-        <Input ref={inputRef} type="text" placeholder="New Task"></Input>
-        <Button onClick={handleTodoAdd}>Add</Button>
-        <button onClick={handleClearAll}>Delete</button>
+        <Grid $columns="2fr 1fr">
+          <Input ref={inputRef} type="text" placeholder="Nueva Tarea"></Input>
+          <div>
+            <Button onClick={handleTodoAdd}>Add</Button>
+            <DeleteButton onClick={handleClearAll}>Delete</DeleteButton>
+          </div>
+        </Grid>
 
         <TextStyle>
-        Te quedan {todos.filter((todo) => !todo.completed).length} tareas por
-        terminar
+          {remainingTask === 0
+            ? "Tareas completas"
+            : `Te quedan ${remainingTask} tareas por
+            terminar`}
         </TextStyle>
 
         <Border>
-        <TodoList todos={todos} toggleTodo={toggleTodo} />
+          <TodoList todos={todos} toggleTodo={toggleTodo} />
         </Border>
-        
       </ContainerChildren>
-      
     </Container>
-      
-    
-    </>
   );
 }

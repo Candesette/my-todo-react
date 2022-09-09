@@ -1,4 +1,6 @@
 import React from "react";
+import { Checkbox } from "../../core/Checkbox";
+import { ItemContainer } from "../../core/ItemContainer";
 import { Item } from "../../scenes/Home";
 
 type Props = {
@@ -10,13 +12,9 @@ export function TodoItem({ todo, toggleTodo }: Props) {
   const { id, task, completed } = todo;
 
   return (
-    <li>
-      <input
-        type="checkbox"
-        checked={completed}
-        onChange={() => toggleTodo(id)}
-      />
+    <ItemContainer>
+      <Checkbox checked={completed} onChange={() => toggleTodo(id)} />
       {task}
-    </li>
+    </ItemContainer>
   );
 }
