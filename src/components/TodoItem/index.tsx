@@ -4,6 +4,7 @@ import { ItemContainer } from "../../core/ItemContainer";
 import { Item } from "../../scenes/Home";
 import { Label } from "../../core/Label";
 import { Ielement } from "../../core/Checkbox";
+import { TextContainer } from "./styles";
 
 type Props = {
   todo: Item;
@@ -17,9 +18,9 @@ export function TodoItem({ todo, toggleTodo }: Props) {
     <ItemContainer>
       <Label>
         <Checkbox checked={completed} onChange={() => toggleTodo(id)} />
-        {task}
-        <Ielement></Ielement>
+        <Ielement />
       </Label>
+      <TextContainer> {task} </TextContainer>
     </ItemContainer>
   );
 }

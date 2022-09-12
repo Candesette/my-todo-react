@@ -11,9 +11,11 @@ export const ItemContainer = styled.li`
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;
+  align-items: center;
   letter-spacing: 1px;
   font-size: large;
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   max-width: 250px;
+  min-width: 250px;
   word-break: break-word;
 `;

@@ -73,13 +73,15 @@ export function Home() {
   return (
     <Container>
       <ContainerChildren>
-        <Grid $columns="2fr 1fr">
-          <Input ref={inputRef} type="text" placeholder="Nueva Tarea"></Input>
-          <div>
-            <Button onClick={handleTodoAdd}>Add</Button>
-            <DeleteButton onClick={handleClearAll}>Delete</DeleteButton>
-          </div>
-        </Grid>
+        <form onSubmit={handleTodoAdd}>
+          <Grid $columns="2fr 1fr">
+            <Input ref={inputRef} type="text" placeholder="Nueva Tarea"></Input>
+            <div>
+              <Button type="submit">Add</Button>
+              <DeleteButton onClick={handleClearAll}>Delete</DeleteButton>
+            </div>
+          </Grid>
+        </form>
 
         <TextStyle>
           {remainingTask === 0

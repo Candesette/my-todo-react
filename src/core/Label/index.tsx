@@ -6,6 +6,7 @@ export const Label = styled.label`
   -moz-appearance: none;
   position: relative;
   margin-bottom: 3px;
-  padding: 5px 0 0px 60px;
+  //padding: 5px 0 0px 60px;
+  height: 29px;
   display: block;
 `;
