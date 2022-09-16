@@ -20,7 +20,7 @@ export function TodoItem({ todo, toggleTodo }: Props) {
         <Checkbox checked={completed} onChange={() => toggleTodo(id)} />
         <Ielement />
       </Label>
-      <TextContainer> {task} </TextContainer>
+      <TextContainer>{task}</TextContainer>
     </ItemContainer>
   );
 }
