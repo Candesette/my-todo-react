@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { Home } from "./scenes/Home";
 import reportWebVitals from "./reportWebVitals";
+import { ThemeProvider } from "styled-components";
+import theme from "./config/theme";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -12,7 +14,9 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    <Home/>
+    <ThemeProvider theme={theme}>
+      <Home />
+    </ThemeProvider>
   </React.StrictMode>
 );
 

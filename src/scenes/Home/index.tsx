@@ -1,6 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { TodoList } from "../../components/TodoList";
+import { TextStyle } from "../../core/TextStyle";
+import { Button, DeleteButton } from "../../core/Button";
+import { Container } from "../../core/Container";
+import { ContainerChildren } from "../../core/ContainerChildren";
+import { Border } from "../../core/Border";
+import { Input } from "../../core/Input";
+import { Grid } from "../../core/Grid";
 
 const key = "todoApp.todos";
 
@@ -12,7 +19,7 @@ export function Home() {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    const storedTodos = JSON.parse(localStorage.getItem(key) ?? "");
+    const storedTodos = JSON.parse(localStorage.getItem(key) ?? "[]");
 
     if (storedTodos) {
       setTodos(storedTodos);
@@ -61,17 +68,32 @@ export function Home() {
     localStorage.setItem(key, JSON.stringify(newTodos));
   };
 
-  return (
-    <>
-      <TodoList todos={todos} toggleTodo={toggleTodo} />
-      <input ref={inputRef} type="text" placeholder="Nueva Tarea"></input>
-      <button onClick={handleTodoAdd}>Add</button>
-      <button onClick={handleClearAll}>Delete</button>
+  const remainingTask = todos.filter((todo) => !todo.completed).length;
 
-      <div>
-        Te quedan {todos.filter((todo) => !todo.completed).length} tareas por
-        terminar
-      </div>
-    </>
+  return (
+    <Container>
+      <ContainerChildren>
+        <form onSubmit={handleTodoAdd}>
+          <Grid $columns="2fr 1fr">
+            <Input ref={inputRef} type="text" placeholder="Nueva Tarea"></Input>
+            <div>
+              <Button type="submit">Add</Button>
+              <DeleteButton onClick={handleClearAll}>Delete</DeleteButton>
+            </div>
+          </Grid>
+        </form>
+
+        <TextStyle>
+          {remainingTask === 0
+            ? "Tareas completas"
+            : `Te quedan ${remainingTask} tareas por
+            terminar`}
+        </TextStyle>
+
+        <Border>
+          <TodoList todos={todos} toggleTodo={toggleTodo} />
+        </Border>
+      </ContainerChildren>
+    </Container>
   );
 }
