@@ -5,6 +5,23 @@ import { Home } from "./scenes/Home";
 import reportWebVitals from "./reportWebVitals";
 import { ThemeProvider } from "styled-components";
 import theme from "./config/theme";
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+import { Contact } from "./scenes/Contact";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home/>,
+  },
+  {
+    path: "/contact",
+    element: <Contact/>,
+  },
+]);
+
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -15,8 +32,9 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <Home />
+      <RouterProvider router={router} />
     </ThemeProvider>
+    
   </React.StrictMode>
 );
 
