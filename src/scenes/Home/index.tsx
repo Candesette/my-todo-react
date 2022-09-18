@@ -41,8 +41,8 @@ export function Home() {
     }
   };
 
-  const handleTodoAdd = (event:FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const handleTodoAdd = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
     const task = inputRef.current?.value;
     if (!task) return;

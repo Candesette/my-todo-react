@@ -5,23 +5,19 @@ import { Home } from "./scenes/Home";
 import reportWebVitals from "./reportWebVitals";
 import { ThemeProvider } from "styled-components";
 import theme from "./config/theme";
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Contact } from "./scenes/Contact";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home/>,
+    element: <Home />,
   },
   {
     path: "/contact",
-    element: <Contact/>,
+    element: <Contact />,
   },
 ]);
-
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -34,7 +30,6 @@ root.render(
     <ThemeProvider theme={theme}>
       <RouterProvider router={router} />
     </ThemeProvider>
-    
   </React.StrictMode>
 );
 
