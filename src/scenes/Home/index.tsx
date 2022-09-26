@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, FormEvent } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { TodoList } from "../../components/TodoList";
 import { TextStyle } from "../../core/TextStyle";
@@ -8,6 +8,7 @@ import { ContainerChildren } from "../../core/ContainerChildren";
 import { Border } from "../../core/Border";
 import { Input } from "../../core/Input";
 import { Grid } from "../../core/Grid";
+import { Link } from "react-router-dom";
 
 const key = "todoApp.todos";
 
@@ -40,7 +41,9 @@ export function Home() {
     }
   };
 
-  const handleTodoAdd = () => {
+  const handleTodoAdd = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     const task = inputRef.current?.value;
     if (!task) return;
 
@@ -94,6 +97,7 @@ export function Home() {
           <TodoList todos={todos} toggleTodo={toggleTodo} />
         </Border>
       </ContainerChildren>
+      <Link to="contact">Contact</Link>
     </Container>
   );
 }
