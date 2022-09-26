@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, FormEvent } from "react";
+import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { TodoList } from "../../components/TodoList";
 import { TextStyle } from "../../core/TextStyle";
@@ -9,15 +9,22 @@ import { Border } from "../../core/Border";
 import { Input } from "../../core/Input";
 import { Grid } from "../../core/Grid";
 import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const key = "todoApp.todos";
 
 export type Item = { id: string; completed: boolean; task: string };
 
+const schema = yup
+  .object({
+    taskName: yup.string().required("This is required"),
+  })
+  .required();
+
 export function Home() {
   const [todos, setTodos] = useState<Item[]>([]);
-
-  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const storedTodos = JSON.parse(localStorage.getItem(key) ?? "[]");
@@ -41,11 +48,8 @@ export function Home() {
     }
   };
 
-  const handleTodoAdd = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const task = inputRef.current?.value;
-    if (!task) return;
+  const handleTodoAdd = (values) => {
+    const task = values.taskName;
 
     setTodos((prevTodos) => {
       const todosToAppend = [
@@ -57,40 +61,54 @@ export function Home() {
 
       return todosToAppend;
     });
-
-    if (inputRef.current) {
-      inputRef.current.value = "";
-    }
   };
 
   const handleClearAll = () => {
-    const newTodos = todos.filter((todo) => !todo.completed);
+    let todosCopy = [...todos];
+    const filteredTodos = todosCopy.filter((todo) => !todo.completed);
 
-    setTodos(newTodos);
+    setTodos(filteredTodos);
 
-    localStorage.setItem(key, JSON.stringify(newTodos));
+    localStorage.setItem(key, JSON.stringify(filteredTodos));
   };
 
   const remainingTask = todos.filter((todo) => !todo.completed).length;
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      taskName: "",
+    },
+    resolver: yupResolver(schema),
+  });
+
   return (
     <Container>
       <ContainerChildren>
-        <form onSubmit={handleTodoAdd}>
+        <form onSubmit={handleSubmit(handleTodoAdd)}>
           <Grid $columns="2fr 1fr">
-            <Input ref={inputRef} type="text" placeholder="Nueva Tarea"></Input>
+            <Input
+              {...register("taskName")}
+              type="text"
+              placeholder="New task"
+            ></Input>
+
             <div>
               <Button type="submit">Add</Button>
               <DeleteButton onClick={handleClearAll}>Delete</DeleteButton>
             </div>
+            <p>{errors.taskName?.message}</p>
           </Grid>
         </form>
 
         <TextStyle>
           {remainingTask === 0
-            ? "Tareas completas"
-            : `Te quedan ${remainingTask} tareas por
-            terminar`}
+            ? "No pending tasks"
+            : ` ${remainingTask} 
+            pending tasks`}
         </TextStyle>
 
         <Border>
