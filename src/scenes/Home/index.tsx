@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import React, { useEffect, useMemo } from "react";
 import { TodoList } from "../../components/TodoList";
 import { TextStyle } from "../../core/TextStyle";
 import { Button, DeleteButton } from "../../core/Button";
@@ -13,9 +12,6 @@ import { useFieldArray, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
-import { url } from "inspector";
-
-const key = "todoApp.todos";
 
 export type Item = { id: string; completed: boolean; task: string };
 
@@ -31,22 +27,31 @@ export function Home() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<{ taskName: string, todos: Item[] }>({
+  } = useForm<{ taskName: string; todos: Item[] }>({
     defaultValues: {
-      taskName: '',
+      taskName: "",
       todos: [],
     },
     resolver: yupResolver(schema),
   });
 
-  const { fields: todos, append, remove, replace } = useFieldArray({
+  const {
+    fields: todos,
+    append,
+    remove,
+    update,
+  } = useFieldArray({
     control,
-    name: 'todos',
-    keyName: 'key'
-  })
+    name: "todos",
+    keyName: "key",
+  });
 
   useEffect(() => {
-    axios.get("https://jsonplaceholder.typicode.com/todos").then((response) => {
+    const load = async () => {
+      const response = await axios.get(
+        "https://jsonplaceholder.typicode.com/todos"
+      );
+
       const todos = response.data.map((todo) => ({
         id: todo.id,
         completed: todo.completed,
@@ -54,19 +59,22 @@ export function Home() {
       }));
 
       append(todos);
-    });
+    };
+
+    load();
   }, []);
 
   const toggleTodo = (id: string) => {
     const newTodos = [...todos];
 
+    const index = newTodos.findIndex((todo) => todo.id === id);
     const todo = newTodos.find((todo) => todo.id === id);
 
     if (todo) {
       todo.completed = !todo.completed;
     }
 
-    replace(todo)
+    update(index, todo);
   };
 
   const handleTodoAdd = (values) => {
@@ -83,26 +91,30 @@ export function Home() {
           id: response.data.id,
           task: response.data.title,
           completed: response.data.completed,
-        })
+        });
       });
   };
 
   const handleClearAll = () => {
     let todosCopy = [...todos];
-    const filteredTodos = todosCopy.filter((todo) => !todo.completed);
+    const filteredTodos = todosCopy.filter((todo) => todo.completed);
 
     filteredTodos.forEach((task) => {
-      axios
-        .delete(`https://jsonplaceholder.typicode.com/todos/${task.id}`)
-        .then(() => {
-          const index = todos.findIndex(todo => todo.id === task.id)
-
-          remove(index)
-        })
+      axios.delete(`https://jsonplaceholder.typicode.com/todos/${task.id}`);
     });
+
+    const indexes = filteredTodos.map((todo) =>
+      todosCopy.findIndex((t) => t.id === todo.id)
+    );
+
+    remove(indexes);
   };
 
-  const remainingTask = todos.filter((todo) => !todo.completed).length;
+  const remainingTask = useMemo(() => {
+    const todosCopy = [...todos];
+
+    return todosCopy.filter((todo) => !todo.completed).length;
+  }, [todos]);
 
   return (
     <Container>
