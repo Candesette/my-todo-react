@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
+import React, { useEffect, useMemo } from "react";
 import { TodoList } from "../../components/TodoList";
 import { TextStyle } from "../../core/TextStyle";
 import { Button, DeleteButton } from "../../core/Button";
@@ -9,11 +8,10 @@ import { Border } from "../../core/Border";
 import { Input } from "../../core/Input";
 import { Grid } from "../../core/Grid";
 import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-
-const key = "todoApp.todos";
+import axios from "axios";
 
 export type Item = { id: string; completed: boolean; task: string };
 
@@ -24,66 +22,99 @@ const schema = yup
   .required();
 
 export function Home() {
-  const [todos, setTodos] = useState<Item[]>([]);
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ taskName: string; todos: Item[] }>({
+    defaultValues: {
+      taskName: "",
+      todos: [],
+    },
+    resolver: yupResolver(schema),
+  });
+
+  const {
+    fields: todos,
+    append,
+    remove,
+    update,
+  } = useFieldArray({
+    control,
+    name: "todos",
+    keyName: "key",
+  });
 
   useEffect(() => {
-    const storedTodos = JSON.parse(localStorage.getItem(key) ?? "[]");
+    const load = async () => {
+      const response = await axios.get(
+        "https://jsonplaceholder.typicode.com/todos"
+      );
 
-    if (storedTodos) {
-      setTodos(storedTodos);
-    }
+      const todos = response.data.map((todo) => ({
+        id: todo.id,
+        completed: todo.completed,
+        task: todo.title,
+      }));
+
+      append(todos);
+    };
+
+    load();
   }, []);
 
   const toggleTodo = (id: string) => {
     const newTodos = [...todos];
 
+    const index = newTodos.findIndex((todo) => todo.id === id);
     const todo = newTodos.find((todo) => todo.id === id);
 
     if (todo) {
       todo.completed = !todo.completed;
-
-      setTodos(newTodos);
-
-      localStorage.setItem(key, JSON.stringify(newTodos));
     }
+
+    update(index, todo);
   };
 
   const handleTodoAdd = (values) => {
     const task = values.taskName;
 
-    setTodos((prevTodos) => {
-      const todosToAppend = [
-        ...prevTodos,
-        { id: uuidv4(), task, completed: false },
-      ];
-
-      localStorage.setItem(key, JSON.stringify(todosToAppend));
-
-      return todosToAppend;
-    });
+    axios
+      .post("https://jsonplaceholder.typicode.com/todos", {
+        title: task,
+        completed: false,
+        userId: 1,
+      })
+      .then((response) => {
+        append({
+          id: response.data.id,
+          task: response.data.title,
+          completed: response.data.completed,
+        });
+      });
   };
 
   const handleClearAll = () => {
     let todosCopy = [...todos];
-    const filteredTodos = todosCopy.filter((todo) => !todo.completed);
+    const filteredTodos = todosCopy.filter((todo) => todo.completed);
 
-    setTodos(filteredTodos);
+    filteredTodos.forEach((task) => {
+      axios.delete(`https://jsonplaceholder.typicode.com/todos/${task.id}`);
+    });
 
-    localStorage.setItem(key, JSON.stringify(filteredTodos));
+    const indexes = filteredTodos.map((todo) =>
+      todosCopy.findIndex((t) => t.id === todo.id)
+    );
+
+    remove(indexes);
   };
 
-  const remainingTask = todos.filter((todo) => !todo.completed).length;
+  const remainingTask = useMemo(() => {
+    const todosCopy = [...todos];
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      taskName: "",
-    },
-    resolver: yupResolver(schema),
-  });
+    return todosCopy.filter((todo) => !todo.completed).length;
+  }, [todos]);
 
   return (
     <Container>
@@ -94,7 +125,7 @@ export function Home() {
               {...register("taskName")}
               type="text"
               placeholder="New task"
-            ></Input>
+            />
 
             <div>
               <Button type="submit">Add</Button>
